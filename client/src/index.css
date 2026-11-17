@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Gaya dasar ─────────────────────────────────────────────────────────── */
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-krem text-ink font-sans antialiased;
+    /* Gradasi lembut biar nggak flat */
+    background-image:
+      radial-gradient(circle at 12% 0%, rgba(255, 217, 125, 0.22), transparent 42%),
+      radial-gradient(circle at 92% 8%, rgba(184, 169, 240, 0.18), transparent 38%),
+      radial-gradient(circle at 50% 100%, rgba(126, 214, 181, 0.16), transparent 42%);
+    background-attachment: fixed;
+  }
+
+  /* Angka nominal lebih rapi */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  .kartu {
+    @apply bg-white/85 backdrop-blur-sm rounded-3xl shadow-lembut;
+  }
+
+  .tombol {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium
+           transition-all duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-mint/30
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .tombol-utama {
+    @apply tombol bg-mint text-white shadow-tombol hover:-translate-y-0.5 hover:brightness-105 active:translate-y-0;
+  }
+
+  .tombol-lembut {
+    @apply tombol bg-white text-ink/80 shadow-lembut hover:bg-krem hover:text-ink;
+  }
+
+  .tombol-bahaya {
+    @apply tombol bg-corals text-coral hover:bg-coral hover:text-white;
+  }
+
+  .input {
+    @apply w-full rounded-2xl bg-white px-4 py-3 text-sm text-ink placeholder:text-inkl/60
+           shadow-lembut outline-none transition-all duration-200
+           focus:ring-4 focus:ring-lavender/25;
+  }
+
+  .label {
+    @apply mb-1.5 block text-xs font-medium text-inkl;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium;
+  }
+}
+
+/* Scrollbar tipis biar tetap santai */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #e8dfd3;
+  border-radius: 99px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}

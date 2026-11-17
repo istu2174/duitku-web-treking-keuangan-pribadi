@@ -1,0 +1,8 @@
+node_modules/
+dist/
+data/*.xlsx
+data/*.xlsx.lock
+.DS_Store
+*.log
+.env
+.env.*
