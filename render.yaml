@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: duitku
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm run install:all && npm run build
+    startCommand: SEED_DEMO=1 npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 22.11.0
