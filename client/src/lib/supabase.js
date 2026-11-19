@@ -3,8 +3,8 @@ import { LOKAL } from './api.js';
 
 // Isi dari Supabase → Project Settings → API. Publishable/anon key memang untuk klien publik (data dilindungi RLS).
 // Kosong = tanpa akun, data cuma di browser.
-const SUPABASE_URL = '';
-const SUPABASE_KEY = '';
+const SUPABASE_URL = 'https://aprhnfptnflohmjezrgo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_orcZKAcG1aYwsnoWPEki4Q_wDK99Nc_';
 
 /** Login pakai nama; Supabase butuh email, jadi nama@domain ini (bukan email asli). */
 export const DOMAIN_EMAIL = '@duitku.app';
