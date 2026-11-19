@@ -16,6 +16,17 @@ disimpan di browser masing-masing (localStorage), privat, nggak dikirim ke mana-
 Tombol **Download Excel** buat cadangan, **Pulihkan dari Excel** buat balikin data / pindah HP.
 Hapus data browser = data hilang, jadi rajin download ya.
 
+**Akun (opsional, Supabase):** masuk/daftar pakai nama + sandi, data tersimpan online
+dan sama di HP maupun laptop. Catatan yang sudah ada di browser ikut masuk ke akun baru.
+
+Setup sekali (pemilik):
+1. Bikin project gratis di [supabase.com](https://supabase.com).
+2. SQL Editor → jalankan [`supabase/schema.sql`](supabase/schema.sql).
+3. Authentication → Sign In / Providers → Email → matikan **Confirm email** (login pakai nama, bukan email asli).
+4. Isi `SUPABASE_URL` dan `SUPABASE_KEY` (publishable/anon key) di `client/src/lib/supabase.js`, lalu push.
+
+Selama belum diisi, web jalan tanpa akun (data di browser saja).
+
 Deploy otomatis lewat GitHub Actions (`.github/workflows/pages.yml`) tiap push ke `main`.
 Build manual: `npm --prefix client run build:pages`, tes: `npm --prefix client test`.
 

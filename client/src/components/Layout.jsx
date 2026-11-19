@@ -1,5 +1,8 @@
+import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { LOKAL, api } from '../lib/api.js';
+import { db, namaDariSesi } from '../lib/supabase.js';
+import AkunForm from './AkunForm.jsx';
 import { useToast } from './Toast.jsx';
 
 const MENU = [
@@ -57,6 +60,12 @@ function TombolPulihkan({ className, children, ...props }) {
 export default function Layout() {
   const navigate = useNavigate();
   const lokasi = useLocation();
+  const [akunBuka, setAkunBuka] = useState(false);
+  const [namaAkun, setNamaAkun] = useState(null);
+
+  useEffect(() => {
+    db?.auth.getSession().then(({ data }) => setNamaAkun(namaDariSesi(data.session)));
+  }, []);
 
   // Tombol "+ Catat" di mobile langsung membuka form di halaman Transaksi
   const bukaFormBaru = () => {
@@ -94,9 +103,20 @@ export default function Layout() {
           {LOKAL ? (
             <>
               <TombolPulihkan className="tombol-lembut w-full">⬆️ Pulihkan dari Excel</TombolPulihkan>
+              {db && (
+                <button type="button" onClick={() => setAkunBuka(true)} className="tombol-lembut w-full">
+                  {namaAkun ? `👤 ${namaAkun}` : '☁️ Masuk / Daftar'}
+                </button>
+              )}
               <p className="px-1 text-[11px] leading-relaxed text-inkl/80">
-                Data cuma tersimpan di browser ini, nggak dikirim ke mana-mana. Rajin{' '}
-                <span className="font-medium">Download Excel</span> buat cadangan / pindah HP.
+                {namaAkun ? (
+                  'Data tersimpan di akunmu & sinkron di semua device.'
+                ) : (
+                  <>
+                    Data cuma tersimpan di browser ini.{db && ' Masuk biar sinkron di HP & laptop.'}{' '}
+                    Rajin <span className="font-medium">Download Excel</span> buat cadangan.
+                  </>
+                )}
               </p>
             </>
           ) : (
@@ -114,6 +134,17 @@ export default function Layout() {
         <header className="sticky top-0 z-20 flex items-center justify-between border-b border-white/60 bg-krem/85 px-4 py-3 backdrop-blur-md md:hidden">
           <Logo />
           <div className="flex gap-2">
+            {db && (
+              <button
+                type="button"
+                onClick={() => setAkunBuka(true)}
+                className="grid h-11 w-11 place-items-center rounded-2xl bg-white text-lg shadow-lembut"
+                title={namaAkun ? `Akun: ${namaAkun}` : 'Masuk / Daftar'}
+                aria-label={namaAkun ? `Akun: ${namaAkun}` : 'Masuk / Daftar'}
+              >
+                {namaAkun ? '👤' : '☁️'}
+              </button>
+            )}
             {LOKAL && (
               <TombolPulihkan
                 className="grid h-11 w-11 place-items-center rounded-2xl bg-white text-lg shadow-lembut"
@@ -179,6 +210,8 @@ export default function Layout() {
       >
         <span className="text-lg leading-none">＋</span> Catat
       </button>
+
+      {db && <AkunForm open={akunBuka} onClose={() => setAkunBuka(false)} nama={namaAkun} />}
     </div>
   );
 }
