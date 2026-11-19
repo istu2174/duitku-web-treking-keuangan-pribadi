@@ -1,7 +1,10 @@
 /** Pembungkus fetch ke API Duitku. Semua error dilempar sebagai Error berpesan Indonesia. */
 const BASE = '/api';
+/** Build GitHub Pages (vite --mode pages): tanpa server, data di localStorage. */
+export const LOKAL = import.meta.env.MODE === 'pages';
 
 async function minta(path, opsi = {}) {
+  if (LOKAL) return (await import('./lokal.js')).minta(path, opsi);
   let res;
   try {
     res = await fetch(BASE + path, {
@@ -60,4 +63,14 @@ export const api = {
   // Ringkasan & export
   ringkasan: (params) => minta(`/ringkasan${qs(params)}`),
   urlExport: '/api/export',
+  /** onClick link Download Excel: di mode lokal file dibuat di browser. */
+  onExport: LOKAL
+    ? (e) => {
+        e.preventDefault();
+        import('./lokal.js')
+          .then((m) => m.eksporExcel())
+          .catch(() => window.alert('Gagal membuat file Excel, coba lagi ya.'));
+      }
+    : undefined,
+  imporExcel: (file) => import('./lokal.js').then((m) => m.imporExcel(file)),
 };

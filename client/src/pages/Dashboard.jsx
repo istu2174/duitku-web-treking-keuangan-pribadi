@@ -128,7 +128,12 @@ export default function Dashboard() {
               </option>
             ))}
           </select>
-          <a href={api.urlExport} download className="tombol-lembut hidden sm:inline-flex">
+          <a
+            href={api.urlExport}
+            onClick={api.onExport}
+            download
+            className="tombol-lembut hidden sm:inline-flex"
+          >
             ⬇️ <span>Download Excel</span>
           </a>
         </div>

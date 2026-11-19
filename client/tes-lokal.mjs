@@ -1,0 +1,35 @@
+// Self-check versi GitHub Pages (controller + localStorage + impor Excel). Jalankan: npm test
+import { createServer } from 'vite';
+import assert from 'node:assert/strict';
+const mem = {};
+globalThis.localStorage = { getItem: (k) => mem[k] ?? null, setItem: (k, v) => { mem[k] = v; } };
+const vite = await createServer({ root: process.cwd(), mode: 'pages', server: { middlewareMode: true }, logLevel: 'error', optimizeDeps: { noDiscovery: true, include: [] } });
+const { minta, imporExcel } = await vite.ssrLoadModule('/src/lib/lokal.js');
+const kat = await minta('/kategori');
+assert.equal(kat.items.length, 13);
+const t = await minta('/transaksi', { method: 'POST', body: JSON.stringify({ tanggal: '2026-11-19', tipe: 'Pengeluaran', kategori: 'Transport', nominal: 15000, catatan: 'ojek' }) });
+assert.ok(t.id);
+await minta(`/transaksi/${t.id}`, { method: 'PUT', body: JSON.stringify({ ...t, nominal: 20000 }) });
+const r = await minta('/ringkasan?bulan=11&tahun=2026');
+assert.equal(r.totalPengeluaran, 20000);
+const trans = kat.items.find((k) => k.nama === 'Transport');
+await assert.rejects(minta(`/kategori/${trans.id}`, { method: 'DELETE' }), /masih dipakai/);
+await assert.rejects(minta('/transaksi', { method: 'POST', body: '{}' }), /YYYY-MM-DD/);
+const list = await minta('/transaksi?q=ojek&page=1&limit=10');
+assert.equal(list.total, 1);
+// round-trip: tulis Excel lalu impor balik
+const { default: ExcelJS } = await import('exceljs');
+const { tulisSheets } = await vite.ssrLoadModule('/../server/services/sheets.js');
+const wb = new ExcelJS.Workbook();
+const data = JSON.parse(mem['duitku-data']);
+data.transaksi.push({ id: 'x', tanggal: '2026-13-40', tipe: 'Pemasukan', kategori: 'Gaji', nominal: 5, catatan: '' });
+tulisSheets(wb, data);
+mem['duitku-data'] = JSON.stringify({ transaksi: [], kategori: [] });
+const hasil = await imporExcel(new Blob([await wb.xlsx.writeBuffer()]));
+assert.deepEqual(hasil, { transaksi: 1, dilewati: 1 });
+assert.equal((await minta('/kategori')).items.length, 13);
+await assert.rejects(imporExcel(new Blob(['bukan excel'])), /nggak bisa dibaca/);
+await minta(`/transaksi/${t.id}`, { method: 'DELETE' });
+assert.equal((await minta('/transaksi')).total, 0);
+console.log('semua tes lokal lolos');
+await vite.close();

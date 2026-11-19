@@ -7,6 +7,18 @@ dibackup, atau diedit manual.
 Dibuat mengikuti PRD: React + Vite + Tailwind + Recharts di frontend, Express +
 `exceljs` di backend, tanpa database lain. Tanpa login, satu pengguna, jalan lokal.
 
+## 🌐 Pakai online
+
+**https://istu2174.github.io/duitku-web-treking-keuangan-pribadi/**
+
+Versi online jalan penuh di browser (GitHub Pages, tanpa server): data tiap orang
+disimpan di browser masing-masing (localStorage), privat, nggak dikirim ke mana-mana.
+Tombol **Download Excel** buat cadangan, **Pulihkan dari Excel** buat balikin data / pindah HP.
+Hapus data browser = data hilang, jadi rajin download ya.
+
+Deploy otomatis lewat GitHub Actions (`.github/workflows/pages.yml`) tiap push ke `main`.
+Build manual: `npm --prefix client run build:pages`, tes: `npm --prefix client test`.
+
 ---
 
 ## ✨ Fitur

@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { api } from '../lib/api.js';
+import { LOKAL, api } from '../lib/api.js';
+import { useToast } from './Toast.jsx';
 
 const MENU = [
   { ke: '/', label: 'Dashboard', ikon: '🏠' },
@@ -27,6 +28,29 @@ function Logo() {
         <p className="text-[11px] text-inkl">catatan duit santai</p>
       </div>
     </div>
+  );
+}
+
+/** Versi online: pulihkan data dari file hasil "Download Excel" (mengganti data di browser). */
+function TombolPulihkan({ className, children, ...props }) {
+  const toast = useToast();
+  const pilih = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (!window.confirm('Semua data di browser ini akan diganti dengan isi file. Lanjut?')) return;
+    try {
+      await api.imporExcel(file);
+      window.location.reload();
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+  return (
+    <label className={`cursor-pointer focus-within:ring-4 focus-within:ring-lavender/25 ${className}`} {...props}>
+      {children}
+      <input type="file" accept=".xlsx" className="sr-only" onChange={pilih} />
+    </label>
   );
 }
 
@@ -64,13 +88,23 @@ export default function Layout() {
         </nav>
 
         <div className="mt-auto space-y-3">
-          <a href={api.urlExport} className="tombol-utama w-full" download>
+          <a href={api.urlExport} onClick={api.onExport} className="tombol-utama w-full" download>
             ⬇️ Download Excel
           </a>
-          <p className="px-1 text-[11px] leading-relaxed text-inkl/80">
-            Semua catatan tersimpan di <span className="font-medium">data/keuangan.xlsx</span>.
-            Bisa dibuka & diedit manual pakai Excel.
-          </p>
+          {LOKAL ? (
+            <>
+              <TombolPulihkan className="tombol-lembut w-full">⬆️ Pulihkan dari Excel</TombolPulihkan>
+              <p className="px-1 text-[11px] leading-relaxed text-inkl/80">
+                Data cuma tersimpan di browser ini, nggak dikirim ke mana-mana. Rajin{' '}
+                <span className="font-medium">Download Excel</span> buat cadangan / pindah HP.
+              </p>
+            </>
+          ) : (
+            <p className="px-1 text-[11px] leading-relaxed text-inkl/80">
+              Semua catatan tersimpan di <span className="font-medium">data/keuangan.xlsx</span>.
+              Bisa dibuka & diedit manual pakai Excel.
+            </p>
+          )}
         </div>
       </aside>
 
@@ -79,15 +113,27 @@ export default function Layout() {
         {/* Topbar mobile */}
         <header className="sticky top-0 z-20 flex items-center justify-between border-b border-white/60 bg-krem/85 px-4 py-3 backdrop-blur-md md:hidden">
           <Logo />
-          <a
-            href={api.urlExport}
-            download
-            className="grid h-11 w-11 place-items-center rounded-2xl bg-white text-lg shadow-lembut"
-            title="Download Excel"
-            aria-label="Download Excel"
-          >
-            ⬇️
-          </a>
+          <div className="flex gap-2">
+            {LOKAL && (
+              <TombolPulihkan
+                className="grid h-11 w-11 place-items-center rounded-2xl bg-white text-lg shadow-lembut"
+                title="Pulihkan dari Excel"
+                aria-label="Pulihkan dari Excel"
+              >
+                ⬆️
+              </TombolPulihkan>
+            )}
+            <a
+              href={api.urlExport}
+              onClick={api.onExport}
+              download
+              className="grid h-11 w-11 place-items-center rounded-2xl bg-white text-lg shadow-lembut"
+              title="Download Excel"
+              aria-label="Download Excel"
+            >
+              ⬇️
+            </a>
+          </div>
         </header>
 
         <main className="mx-auto w-full max-w-5xl px-4 pb-28 pt-5 md:px-8 md:pb-12 md:pt-9">
